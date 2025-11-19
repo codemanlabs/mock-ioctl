@@ -19,8 +19,8 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        UID: ${UID:-1000}
-        GID: ${GID:-1000}
+        UID: ${LOCAL_UID}
+        GID: ${LOCAL_GID}
     image: mock-ioctl
     container_name: mock-ioctl
     working_dir: /workspace

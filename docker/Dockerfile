@@ -45,16 +45,32 @@ ENV PATH="/opt/conan/bin:${PATH}"
 RUN conan profile detect
 
 # ---------------------------------------------------------------------------
-# 3. Create a *static* user named "dev" but inject host UID/GID
+# 3. Create a static user "dev" matching host UID/GID
 # ---------------------------------------------------------------------------
 ARG UID=1000
 ARG GID=1000
 
-# Create group
-RUN groupadd -g ${GID} dev || true
+# Ensure UID/GID are valid non-zero integers
+RUN if [ "$UID" -eq 0 ] || [ "$GID" -eq 0 ]; then \
+        echo "ERROR: UID/GID cannot be 0" && exit 1; \
+    fi
 
-# Create user with the host UID/GID
-RUN useradd -m -u ${UID} -g ${GID} -s /bin/bash dev || true
+# Create or reuse group
+RUN if getent group $GID >/dev/null; then \
+        groupname=$(getent group $GID | cut -d: -f1); \
+        if [ "$groupname" != "dev" ]; then groupmod -n dev "$groupname"; fi; \
+    else \
+        groupadd -g $GID dev; \
+    fi
+
+# Create or reuse user
+RUN if id -u $UID >/dev/null 2>&1; then \
+        username=$(getent passwd $UID | cut -d: -f1); \
+        if [ "$username" != "dev" ]; then usermod -l dev "$username"; fi; \
+        usermod -d /home/dev -m dev; \
+    else \
+        useradd -m -u $UID -g $GID -s /bin/bash dev; \
+    fi
 
 USER dev
 WORKDIR /workspace
