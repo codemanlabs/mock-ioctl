@@ -1,0 +1,32 @@
+# ---------------------------------------------------------------------------
+# Build and Run
+# ---------------------------------------------------------------------------
+# UID=$(id -u) GID=$(id -g) docker compose up --build
+
+# ---------------------------------------------------------------------------
+# Just run post build
+# ---------------------------------------------------------------------------
+# docker compose up
+
+# ---------------------------------------------------------------------------
+# Enter the container shell
+# ---------------------------------------------------------------------------
+# docker exec -it mock-ioctl bash
+
+services:
+  cpp-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    image: mock-ioctl
+    container_name: mock-ioctl
+    working_dir: /workspace
+    volumes:
+      - ../:/workspace
+    tty: true
+    stdin_open: true
+    environment:
+      - HOME=/home/dev

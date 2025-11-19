@@ -1,0 +1,34 @@
+{
+  "name": "Mock IOCTL Dev Environment",
+  "dockerComposeFile": [
+    "../docker/docker-compose.yml"
+  ],
+  "service": "cpp-dev",
+  "workspaceFolder": "/workspace",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-vscode.cpptools-extension-pack",
+        "ms-vscode.remote-explorer",
+        "editorconfig.editorconfig"
+      ],
+      "settings": {
+        "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+        "cmake.useCMakePresets": true,
+        "cmake.configureOnOpen": true
+      }
+    }
+  },
+
+  "remoteUser": "dev",
+
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+  ],
+
+  "postCreateCommand": "conan profile detect --force",
+
+  "features": {}
+}
